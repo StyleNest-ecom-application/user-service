@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: stylenest-postgres
+    environment:
+      POSTGRES_DB: stylenest_user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ecom1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - stylenest-net
+
+  user-service:
+    build: .
+    container_name: stylenest-user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stylenest_user_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ecom1234
+    networks:
+      - stylenest-net
+
+volumes:
+  postgres_data:
+
+networks:
+  stylenest-net:
+    driver: bridge
